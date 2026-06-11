@@ -10,6 +10,8 @@ import ReportsPage from '@/components/reports/ReportsPage'
 import EscalasPage from '@/components/escalas/EscalasPage'
 import LargaEstanciaPage from '@/components/escalas/LargaEstanciaPage'
 import ValoracionesPage from '@/components/valoraciones/ValoracionesPage'
+import DemografiaPage from '@/components/demografia/DemografiaPage'
+import DiagnosticosPage from '@/components/diagnosticos/DiagnosticosPage'
 
 export default function App() {
   const { loading } = useAuth()
@@ -41,6 +43,8 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/demografia" element={<DemografiaPage />} />
+            <Route path="/diagnosticos" element={<DiagnosticosPage />} />
             <Route path="/escalas" element={<EscalasPage />} />
             <Route path="/larga-estancia" element={<LargaEstanciaPage />} />
             <Route path="/valoraciones" element={<ValoracionesPage />} />

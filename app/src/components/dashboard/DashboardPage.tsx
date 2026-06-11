@@ -6,7 +6,7 @@ import {
 import { Users, BedDouble, LogOut as LogOutIcon, HeartPulse, Loader2 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import FiltersBar from '@/components/dashboard/FiltersBar'
-import { useValoracionesFiltradas, countBy } from '@/hooks/useValoraciones'
+import { useValoracionesFiltradas, useEvolucion, countBy } from '@/hooks/useValoraciones'
 import { MESES } from '@/types'
 
 const COLORS = ['#0D2D6B', '#16468E', '#4169b8', '#7494d4', '#a8bce6', '#d3ddf2', '#94a3b8', '#cbd5e1']
@@ -28,20 +28,18 @@ export default function DashboardPage() {
   const porEstado = useMemo(() => countBy(data, v => v.estado_paciente), [data])
   const porEspecialidad = useMemo(() => countBy(data, v => v.especialidad_ultima).slice(0, 8), [data])
 
+  // Evolución mes a mes: cruza TODOS los cortes mensuales (no depende del corte seleccionado)
+  const { data: evolucion = [] } = useEvolucion()
   const historicoMensual = useMemo(() => {
-    const map = new Map<string, number>()
-    for (const v of data) {
-      if (!v.anio_primera || !v.mes_primera) continue
-      const k = `${v.anio_primera}-${String(v.mes_primera).padStart(2, '0')}`
-      map.set(k, (map.get(k) ?? 0) + 1)
-    }
-    return [...map.entries()]
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([k, value]) => {
-        const [anio, mes] = k.split('-')
-        return { name: `${MESES[Number(mes)].substring(0, 3)} ${anio.substring(2)}`, value }
-      })
-  }, [data])
+    return evolucion.map(e => {
+      const [anio, mes] = e.fecha_corte.split('-')
+      return {
+        name: `${MESES[Number(mes)].substring(0, 3)} ${anio.substring(2)}`,
+        value: e.total,
+        largaEstancia: e.larga_estancia,
+      }
+    })
+  }, [evolucion])
 
   if (isLoading) {
     return (
@@ -84,14 +82,16 @@ export default function DashboardPage() {
 
         {/* Histórico mensual */}
         <div className="card p-5">
-          <h3 className="text-sm font-semibold text-clinic-600 mb-4">Histórico mensual de pacientes valorados</h3>
+          <h3 className="text-sm font-semibold text-clinic-600 mb-4">Evolución mensual de pacientes valorados (todos los cortes)</h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={historicoMensual}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip />
+              <Legend />
               <Bar dataKey="value" name="Valorados" fill="#0D2D6B" radius={[4, 4, 0, 0]} />
+              <Bar dataKey="largaEstancia" name="Larga estancia (>20d)" fill="#d97706" radius={[4, 4, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         </div>

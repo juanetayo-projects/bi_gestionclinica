@@ -10,6 +10,8 @@ import {
   Stethoscope,
   ClipboardList,
   BedDouble,
+  Users,
+  HeartPulse,
 } from 'lucide-react'
 import { useStore } from '@/store/useStore'
 import { useAuth } from '@/hooks/useAuth'
@@ -17,6 +19,8 @@ import { clsx } from 'clsx'
 
 const NAV = [
   { to: '/dashboard',      icon: LayoutDashboard, label: 'Resumen General' },
+  { to: '/demografia',     icon: Users,           label: 'Demografía' },
+  { to: '/diagnosticos',   icon: HeartPulse,      label: 'Diagnósticos' },
   { to: '/escalas',        icon: Stethoscope,     label: 'Escalas Clínicas' },
   { to: '/larga-estancia', icon: BedDouble,       label: 'Larga Estancia' },
   { to: '/valoraciones',   icon: ClipboardList,   label: 'Valoraciones' },

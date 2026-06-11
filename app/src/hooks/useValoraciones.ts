@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
 import { useStore } from '@/store/useStore'
-import type { Valoracion, Configuracion, SyncLog } from '@/types'
+import type { Valoracion, Configuracion, SyncLog, EvolucionCorte } from '@/types'
 
 const PAGE = 1000
 
@@ -75,6 +75,19 @@ export function useValoracionesFiltradas() {
   }, [all, filtros])
 
   return { data, all, isLoading, error }
+}
+
+/** Agregados por corte (todos los meses) — para gráficos de evolución */
+export function useEvolucion() {
+  return useQuery({
+    queryKey: ['evolucion'],
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('v_evolucion').select('*')
+      if (error) throw error
+      return data as EvolucionCorte[]
+    },
+  })
 }
 
 export function useConfiguracion() {

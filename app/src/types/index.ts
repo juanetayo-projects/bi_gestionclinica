@@ -170,6 +170,16 @@ export interface Filtros {
   largaEstancia: string | null // 'Si' | 'No' | null
 }
 
+export interface EvolucionCorte {
+  fecha_corte: string
+  total: number
+  larga_estancia: number
+  mujeres: number
+  hombres: number
+  fallecidos: number
+  edad_promedio: number | null
+}
+
 export interface Configuracion {
   id: string
   clave: string
