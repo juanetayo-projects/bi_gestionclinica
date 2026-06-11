@@ -5,7 +5,10 @@ import {
 import { HeartPulse, Hash, Layers, Loader2 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import FiltersBar from '@/components/dashboard/FiltersBar'
-import { useValoracionesFiltradas } from '@/hooks/useValoraciones'
+import InfoTip from '@/components/ui/InfoTip'
+import ExportButtons from '@/components/ui/ExportButtons'
+import { useValoracionesFiltradas, useCorteActivo } from '@/hooks/useValoraciones'
+import { subtituloExport } from '@/utils/format'
 
 /** Capítulos CIE-10 por rango de código */
 const CAPITULOS: { desde: string; hasta: string; nombre: string }[] = [
@@ -43,8 +46,23 @@ function capituloCIE10(code: string | null): string {
 
 export default function DiagnosticosPage() {
   const { data, isLoading } = useValoracionesFiltradas()
+  const { corte } = useCorteActivo()
 
   const total = data.length
+
+  const buildExport = () => {
+    if (!data.length) return null
+    return {
+      titulo: 'Diagnósticos CIE-10 — Gestión Clínica',
+      subtitulo: subtituloExport(corte, data.length),
+      head: ['Ingreso', 'Paciente', 'Código CIE-10', 'Diagnóstico', 'Capítulo'],
+      body: data.map(v => [
+        v.ingreso, v.nombre_paciente, v.dx_principal_codigo, v.dx_principal_nombre,
+        capituloCIE10(v.dx_principal_codigo),
+      ]),
+      nombreArchivo: `diagnosticos_${corte ?? 'actual'}`,
+    }
+  }
 
   const porCapitulo = useMemo(() => {
     const map = new Map<string, number>()
@@ -93,6 +111,10 @@ export default function DiagnosticosPage() {
       <div className="flex-1 p-5 space-y-5 overflow-auto">
         <FiltersBar />
 
+        <div className="flex items-center">
+          <ExportButtons build={buildExport} />
+        </div>
+
         {/* KPIs */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
           {[
@@ -113,8 +135,11 @@ export default function DiagnosticosPage() {
         </div>
 
         {/* Por capítulo CIE-10 */}
-        <div className="card p-5">
-          <h3 className="text-sm font-semibold text-clinic-600 mb-4">Pacientes por capítulo CIE-10</h3>
+        <div className="card-chart p-5">
+          <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+            Pacientes por capítulo CIE-10
+            <InfoTip text="El diagnóstico principal actual del ingreso se clasifica en los 21 capítulos de la CIE-10 según el rango de su código (ej. I00–I99 = Sistema circulatorio). Cada paciente cuenta una vez." />
+          </h3>
           <ResponsiveContainer width="100%" height={Math.max(260, porCapitulo.length * 30)}>
             <BarChart data={porCapitulo} layout="vertical" margin={{ left: 10, right: 30 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -127,8 +152,11 @@ export default function DiagnosticosPage() {
         </div>
 
         {/* Top diagnósticos */}
-        <div className="card p-5">
-          <h3 className="text-sm font-semibold text-clinic-600 mb-4">Diagnósticos más frecuentes (top 15)</h3>
+        <div className="card-chart p-5">
+          <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+            Diagnósticos más frecuentes (top 15)
+            <InfoTip text="Los 15 códigos CIE-10 con más pacientes en el corte y filtros seleccionados. El porcentaje es sobre el total de pacientes filtrados (incluyendo los que no tienen diagnóstico registrado)." />
+          </h3>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

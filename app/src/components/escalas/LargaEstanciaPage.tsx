@@ -5,13 +5,34 @@ import {
 import { Loader2, BedDouble } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import FiltersBar from '@/components/dashboard/FiltersBar'
-import { useValoracionesFiltradas, countBy } from '@/hooks/useValoraciones'
+import InfoTip from '@/components/ui/InfoTip'
+import ExportButtons from '@/components/ui/ExportButtons'
+import { useValoracionesFiltradas, useCorteActivo, countBy } from '@/hooks/useValoraciones'
+import { subtituloExport } from '@/utils/format'
 import { MESES } from '@/types'
 
 export default function LargaEstanciaPage() {
   const { data, isLoading } = useValoracionesFiltradas()
+  const { corte } = useCorteActivo()
 
   const largaEstancia = useMemo(() => data.filter(v => v.estancia_mayor_20_dias === 'Si'), [data])
+
+  const buildExport = () => {
+    if (!largaEstancia.length) return null
+    return {
+      titulo: 'Larga Estancia (>20 días) — Gestión Clínica',
+      subtitulo: subtituloExport(corte, largaEstancia.length),
+      head: ['Ingreso', 'Paciente', 'Identificación', 'Aseguradora', 'F. Ingreso', 'Estancia (d)', 'Causas larga estancia', 'Tipo intervención', 'Últ. Valoración', 'Estado'],
+      body: largaEstancia.map(v => [
+        v.ingreso, v.nombre_paciente, v.identificacion_paciente, v.aseguradora,
+        v.fecha_ingreso, v.estancia_total,
+        v.ultimo_causas_larga_estancia || v.primer_causas_larga_estancia,
+        v.ultimo_tipo_intervencion || v.primer_tipo_intervencion,
+        v.fecha_ultima_valoracion, v.estado_paciente,
+      ]),
+      nombreArchivo: `larga_estancia_${corte ?? 'actual'}`,
+    }
+  }
 
   const causas = useMemo(() => {
     // El campo puede traer varias causas separadas por coma
@@ -76,6 +97,10 @@ export default function LargaEstanciaPage() {
       <div className="flex-1 p-5 space-y-5 overflow-auto">
         <FiltersBar />
 
+        <div className="flex items-center">
+          <ExportButtons build={buildExport} />
+        </div>
+
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="card p-4 flex items-center gap-3">
@@ -106,8 +131,11 @@ export default function LargaEstanciaPage() {
         </div>
 
         {/* Evolución mensual */}
-        <div className="card p-5">
-          <h3 className="text-sm font-semibold text-clinic-600 mb-4">Evolución mensual</h3>
+        <div className="card-chart p-5">
+          <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+            Evolución mensual
+            <InfoTip text="Pacientes agrupados por mes de ingreso hospitalario (dentro del corte y filtros seleccionados). Larga estancia = más de 20 días desde el ingreso real hasta el corte del mes o el egreso." />
+          </h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={evolucionMensual}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -123,8 +151,11 @@ export default function LargaEstanciaPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Causas */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Causas de larga estancia</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Causas de larga estancia
+              <InfoTip text="Causas registradas en la valoración de gestión clínica más reciente (o la primera si no hay posterior). Un paciente puede tener varias causas, por lo que la suma puede superar el total de pacientes." />
+            </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, causas.length * 36)}>
               <BarChart data={causas} layout="vertical" margin={{ left: 10, right: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -137,8 +168,11 @@ export default function LargaEstanciaPage() {
           </div>
 
           {/* Tipo de intervención */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Tipo de intervención</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Tipo de intervención
+              <InfoTip text="Tipo de intervención (Geriatría, Cuidado Paliativo, Larga Estancia, Intervención Familiar, Comité) registrado en la valoración más reciente del paciente con estancia >20 días." />
+            </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, intervenciones.length * 36)}>
               <BarChart data={intervenciones} layout="vertical" margin={{ left: 10, right: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />

@@ -32,8 +32,8 @@ export default function FiltersBar() {
     filtros.largaEstancia || filtros.sexo.length
 
   return (
-    <div className="card p-3 flex flex-wrap items-end gap-3">
-      <div>
+    <div className="card p-3 flex flex-nowrap items-end gap-2 overflow-x-auto">
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Corte mensual</label>
         <select className="filter-select" value={corte ?? ''}
           onChange={e => setFiltros({ corte: e.target.value || null })}>
@@ -42,7 +42,7 @@ export default function FiltersBar() {
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Año</label>
         <select className="filter-select" value={filtros.anio ?? ''}
           onChange={e => setFiltros({ anio: e.target.value ? Number(e.target.value) : null })}>
@@ -51,7 +51,7 @@ export default function FiltersBar() {
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Mes</label>
         <select className="filter-select" value={filtros.mes ?? ''}
           onChange={e => setFiltros({ mes: e.target.value ? Number(e.target.value) : null })}>
@@ -60,34 +60,34 @@ export default function FiltersBar() {
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Aseguradora</label>
-        <select className="filter-select max-w-[180px]" value={filtros.aseguradora[0] ?? ''}
+        <select className="filter-select max-w-[150px]" value={filtros.aseguradora[0] ?? ''}
           onChange={e => setFiltros({ aseguradora: e.target.value ? [e.target.value] : [] })}>
           <option value="">Todas</option>
           {opciones.aseguradoras.map(a => <option key={a} value={a}>{a}</option>)}
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Sede</label>
-        <select className="filter-select max-w-[160px]" value={filtros.sede[0] ?? ''}
+        <select className="filter-select max-w-[130px]" value={filtros.sede[0] ?? ''}
           onChange={e => setFiltros({ sede: e.target.value ? [e.target.value] : [] })}>
           <option value="">Todas</option>
           {opciones.sedes.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Especialidad</label>
-        <select className="filter-select max-w-[170px]" value={filtros.especialidad[0] ?? ''}
+        <select className="filter-select max-w-[140px]" value={filtros.especialidad[0] ?? ''}
           onChange={e => setFiltros({ especialidad: e.target.value ? [e.target.value] : [] })}>
           <option value="">Todas</option>
           {opciones.especialidades.map(s => <option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Sexo</label>
         <select className="filter-select" value={filtros.sexo[0] ?? ''}
           onChange={e => setFiltros({ sexo: e.target.value ? [e.target.value] : [] })}>
@@ -96,7 +96,7 @@ export default function FiltersBar() {
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Estado</label>
         <select className="filter-select" value={filtros.estado[0] ?? ''}
           onChange={e => setFiltros({ estado: e.target.value ? [e.target.value] : [] })}>
@@ -107,7 +107,7 @@ export default function FiltersBar() {
         </select>
       </div>
 
-      <div>
+      <div className="flex-shrink-0">
         <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Larga estancia</label>
         <select className="filter-select" value={filtros.largaEstancia ?? ''}
           onChange={e => setFiltros({ largaEstancia: e.target.value || null })}>
@@ -119,7 +119,7 @@ export default function FiltersBar() {
 
       {hayFiltros ? (
         <button onClick={resetFiltros}
-          className="btn-secondary text-xs flex items-center gap-1.5 ml-auto">
+          className="btn-secondary text-xs flex items-center gap-1.5 ml-auto flex-shrink-0">
           <RotateCcw className="w-3.5 h-3.5" /> Limpiar
         </button>
       ) : null}

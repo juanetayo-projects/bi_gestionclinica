@@ -6,13 +6,32 @@ import {
 import { Users, BedDouble, LogOut as LogOutIcon, HeartPulse, Loader2 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import FiltersBar from '@/components/dashboard/FiltersBar'
-import { useValoracionesFiltradas, useEvolucion, countBy } from '@/hooks/useValoraciones'
+import InfoTip from '@/components/ui/InfoTip'
+import ExportButtons from '@/components/ui/ExportButtons'
+import { useValoracionesFiltradas, useEvolucion, useCorteActivo, countBy } from '@/hooks/useValoraciones'
+import { subtituloExport } from '@/utils/format'
 import { MESES } from '@/types'
 
 const COLORS = ['#0D2D6B', '#16468E', '#4169b8', '#7494d4', '#a8bce6', '#d3ddf2', '#94a3b8', '#cbd5e1']
 
 export default function DashboardPage() {
   const { data, isLoading } = useValoracionesFiltradas()
+  const { corte } = useCorteActivo()
+
+  const buildExport = () => {
+    if (!data.length) return null
+    return {
+      titulo: 'Resumen General — Gestión Clínica',
+      subtitulo: subtituloExport(corte, data.length),
+      head: ['Ingreso', 'Paciente', 'Identificación', 'Sede', 'Aseguradora', 'F. Ingreso', '1ª Valoración', 'Últ. Valoración', 'Atenciones', 'Estancia (d)', '>20 días', 'Estado'],
+      body: data.map(v => [
+        v.ingreso, v.nombre_paciente, v.identificacion_paciente, v.sede, v.aseguradora,
+        v.fecha_ingreso, v.fecha_primera_atencion, v.fecha_ultima_valoracion,
+        v.cantidad_atenciones, v.estancia_total, v.estancia_mayor_20_dias, v.estado_paciente,
+      ]),
+      nombreArchivo: `resumen_general_${corte ?? 'actual'}`,
+    }
+  }
 
   const kpis = useMemo(() => {
     const total = data.length
@@ -59,6 +78,10 @@ export default function DashboardPage() {
       <div className="flex-1 p-5 space-y-5 overflow-auto">
         <FiltersBar />
 
+        <div className="flex items-center">
+          <ExportButtons build={buildExport} />
+        </div>
+
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
           {[
@@ -81,8 +104,11 @@ export default function DashboardPage() {
         </div>
 
         {/* Histórico mensual */}
-        <div className="card p-5">
-          <h3 className="text-sm font-semibold text-clinic-600 mb-4">Evolución mensual de pacientes valorados (todos los cortes)</h3>
+        <div className="card-chart p-5">
+          <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+            Evolución mensual de pacientes valorados (todos los cortes)
+            <InfoTip text="Cuenta los pacientes únicos (ingresos) de cada snapshot mensual, sin importar el corte seleccionado arriba. Larga estancia = pacientes con más de 20 días calculados desde el ingreso real hasta el último día del mes (o el egreso si fue antes)." />
+          </h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={historicoMensual}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -98,8 +124,11 @@ export default function DashboardPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Por aseguradora */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Pacientes por aseguradora</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Pacientes por aseguradora
+              <InfoTip text="Número de pacientes del corte y filtros seleccionados, agrupados por la aseguradora del contrato principal del ingreso. Se muestran las 10 con más pacientes." />
+            </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, porAseguradora.length * 32)}>
               <BarChart data={porAseguradora} layout="vertical" margin={{ left: 10, right: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -112,8 +141,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Estado del paciente */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Estado del paciente</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Estado del paciente
+              <InfoTip text="Estado derivado de cada ingreso: Fallecido si tiene fecha de fallecimiento registrada; Egresado si tiene fecha de egreso; Activo en los demás casos." />
+            </h3>
             <ResponsiveContainer width="100%" height={260}>
               <PieChart>
                 <Pie data={porEstado} dataKey="value" nameKey="name" innerRadius={55} outerRadius={90}
@@ -127,8 +159,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Por sede */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Pacientes por sede</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Pacientes por sede
+              <InfoTip text="Pacientes del corte y filtros seleccionados según la sede (oficina) donde se registró el ingreso hospitalario. El porcentaje es sobre el total filtrado." />
+            </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -154,8 +189,11 @@ export default function DashboardPage() {
           </div>
 
           {/* Por especialidad */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Por especialidad (última valoración)</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Por especialidad (última valoración)
+              <InfoTip text="Especialidad del profesional que realizó la valoración más reciente de gestión clínica de cada paciente. Se muestran las 8 más frecuentes." />
+            </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, porEspecialidad.length * 34)}>
               <BarChart data={porEspecialidad} layout="vertical" margin={{ left: 10, right: 30 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />

@@ -40,13 +40,15 @@ export default function Sidebar() {
         sidebarCollapsed ? 'w-16' : 'w-60'
       )}
     >
-      {/* Logo */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-white/10">
-        <div className="flex-shrink-0">
-          <img src={`${import.meta.env.BASE_URL}logo-white.png`} alt="Logo" className="h-7 w-auto" />
-        </div>
+      {/* Logo con el nombre de la app debajo */}
+      <div className="flex flex-col items-center gap-2 px-4 py-5 border-b border-white/10">
+        <img
+          src={`${import.meta.env.BASE_URL}logo-white.png`}
+          alt="Logo"
+          className={sidebarCollapsed ? 'h-7 w-auto' : 'h-12 w-auto'}
+        />
         {!sidebarCollapsed && (
-          <div className="overflow-hidden">
+          <div className="text-center overflow-hidden">
             <p className="text-white font-bold text-sm leading-tight whitespace-nowrap">
               BI Gestión Clínica
             </p>

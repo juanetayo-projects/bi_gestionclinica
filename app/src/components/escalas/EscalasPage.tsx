@@ -6,7 +6,10 @@ import {
 import { Loader2 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import FiltersBar from '@/components/dashboard/FiltersBar'
-import { useValoracionesFiltradas, countBy } from '@/hooks/useValoraciones'
+import InfoTip from '@/components/ui/InfoTip'
+import ExportButtons from '@/components/ui/ExportButtons'
+import { useValoracionesFiltradas, useCorteActivo, countBy } from '@/hooks/useValoraciones'
+import { subtituloExport } from '@/utils/format'
 import { ESCALAS, type Valoracion } from '@/types'
 
 const COLORS = ['#0D2D6B', '#16468E', '#4169b8', '#7494d4', '#a8bce6', '#94a3b8', '#cbd5e1', '#e2e8f0']
@@ -82,6 +85,49 @@ export default function EscalasPage() {
   }, [conEscala, tab])
 
   const escalaActual = ESCALAS.find(e => e.key === tab)
+  const { corte } = useCorteActivo()
+
+  const buildExport = () => {
+    if (!conEscala.length) return null
+    const nombre = tab === 'barthel' ? 'Barthel' : tab === 'esas' ? 'ESAS-SAS' : escalaActual?.nombre ?? tab
+    if (tab === 'barthel') {
+      return {
+        titulo: 'Escala Barthel — Previo / Actual / Egreso',
+        subtitulo: subtituloExport(corte, conEscala.length),
+        head: ['Ingreso', 'Paciente', 'Previo (valor)', 'Previo (resultado)', 'Actual (valor)', 'Actual (resultado)', 'Egreso (valor)', 'Egreso (resultado)'],
+        body: conEscala.map(v => [
+          v.ingreso, v.nombre_paciente,
+          v.barthel_previo_valoracion, v.barthel_previo_resultado,
+          v.barthel_actual_valoracion, v.barthel_actual_resultado,
+          v.barthel_egreso_valoracion, v.barthel_egreso_resultado,
+        ]),
+        nombreArchivo: `escala_barthel_${corte ?? 'actual'}`,
+      }
+    }
+    if (tab === 'esas') {
+      return {
+        titulo: 'Escala ESAS/SAS — Síntomas (0-10)',
+        subtitulo: subtituloExport(corte, conEscala.length),
+        head: ['Ingreso', 'Paciente', 'Fecha', 'Dolor', 'Cansancio', 'Náuseas', 'Depresión', 'Ansiedad', 'Somnolencia', 'Apetito', 'Bienestar', 'Falta de aire', 'Dif. dormir'],
+        body: conEscala.map(v => [
+          v.ingreso, v.nombre_paciente, v.esas_fecha,
+          v.sas_dolor, v.sas_cansancio, v.sas_nauseas, v.sas_depresion, v.sas_ansiedad,
+          v.sas_somnolencia, v.sas_apetito, v.sas_bienestar, v.sas_falta_aire, v.sas_dificultad_dormir,
+        ]),
+        nombreArchivo: `escala_esas_${corte ?? 'actual'}`,
+      }
+    }
+    return {
+      titulo: `Escala ${nombre} — Resultados`,
+      subtitulo: subtituloExport(corte, conEscala.length),
+      head: ['Ingreso', 'Paciente', 'Fecha aplicación', 'Valoración', 'Resultado'],
+      body: conEscala.map(v => [
+        v.ingreso, v.nombre_paciente,
+        (v as any)[`${tab}_fecha`], (v as any)[`${tab}_valoracion`], (v as any)[`${tab}_resultado`],
+      ]),
+      nombreArchivo: `escala_${tab}_${corte ?? 'actual'}`,
+    }
+  }
 
   if (isLoading) {
     return (
@@ -102,7 +148,7 @@ export default function EscalasPage() {
         <FiltersBar />
 
         {/* Tabs de escalas */}
-        <div className="flex flex-wrap gap-1.5">
+        <div className="flex flex-wrap items-center gap-1.5">
           {[...ESCALAS.map(e => ({ key: e.key, nombre: e.nombre })),
             { key: 'esas', nombre: 'ESAS/SAS' },
             { key: 'barthel', nombre: 'Barthel' },
@@ -114,6 +160,7 @@ export default function EscalasPage() {
               {e.nombre}
             </button>
           ))}
+          <ExportButtons build={buildExport} />
         </div>
 
         {/* KPI aplicados */}
@@ -139,8 +186,11 @@ export default function EscalasPage() {
         {/* Contenido según escala */}
         {tab === 'barthel' ? (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="card p-5">
-              <h3 className="text-sm font-semibold text-clinic-600 mb-4">Promedio Barthel por momento</h3>
+            <div className="card-chart p-5">
+              <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+                Promedio Barthel por momento
+                <InfoTip text="Promedio del puntaje numérico Barthel (suma de las preguntas de la escala) entre los pacientes que tienen evaluación en cada momento: Previo al ingreso, Actual y al Egreso. 'Aplicados' = pacientes con evaluación en ese momento." />
+              </h3>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={barthelMomentos}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -153,8 +203,11 @@ export default function EscalasPage() {
                 </BarChart>
               </ResponsiveContainer>
             </div>
-            <div className="card p-5">
-              <h3 className="text-sm font-semibold text-clinic-600 mb-4">Categorías por momento</h3>
+            <div className="card-chart p-5">
+              <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+                Categorías por momento
+                <InfoTip text="Número de pacientes en cada categoría de dependencia (independiente, leve, moderada, grave/total) según el resultado de la última evaluación Barthel de cada momento (previo, actual, egreso)." />
+              </h3>
               <ResponsiveContainer width="100%" height={Math.max(260, barthelCategorias.length * 40)}>
                 <BarChart data={barthelCategorias} layout="vertical" margin={{ left: 10, right: 20 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -170,8 +223,11 @@ export default function EscalasPage() {
             </div>
           </div>
         ) : tab === 'esas' ? (
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Promedio de síntomas ESAS/SAS (0-10)</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Promedio de síntomas ESAS/SAS (0-10)
+              <InfoTip text="Promedio de la respuesta más reciente de cada paciente a cada síntoma de la escala ESAS (0 = ausente, 10 = el peor posible). Solo se promedian pacientes con respuesta registrada para ese síntoma." />
+            </h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={esasPromedios}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -184,9 +240,10 @@ export default function EscalasPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-            <div className="card p-5">
+            <div className="card-chart p-5">
               <h3 className="text-sm font-semibold text-clinic-600 mb-4">
                 Distribución de resultados — {escalaActual?.titulo}
+                <InfoTip text="Cada paciente cuenta una vez con el resultado de su aplicación más reciente de la escala dentro del corte. La valoración numérica es la suma de los puntajes de las preguntas." />
               </h3>
               <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
@@ -199,8 +256,11 @@ export default function EscalasPage() {
                 </PieChart>
               </ResponsiveContainer>
             </div>
-            <div className="card p-5">
-              <h3 className="text-sm font-semibold text-clinic-600 mb-4">Tabla de resultados</h3>
+            <div className="card-chart p-5">
+              <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+                Tabla de resultados
+                <InfoTip text="n = pacientes con ese resultado en su aplicación más reciente. El porcentaje es sobre el total de pacientes con la escala aplicada." />
+              </h3>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-left">

@@ -6,7 +6,10 @@ import {
 import { Users, Cake, MapPin, Home, Loader2 } from 'lucide-react'
 import Header from '@/components/layout/Header'
 import FiltersBar from '@/components/dashboard/FiltersBar'
-import { useValoracionesFiltradas, countBy } from '@/hooks/useValoraciones'
+import InfoTip from '@/components/ui/InfoTip'
+import ExportButtons from '@/components/ui/ExportButtons'
+import { useValoracionesFiltradas, useCorteActivo, countBy } from '@/hooks/useValoraciones'
+import { subtituloExport } from '@/utils/format'
 import type { Valoracion } from '@/types'
 
 const COLOR_F = '#4169b8'   // mujeres
@@ -47,6 +50,21 @@ function statsEdad(rows: Valoracion[]) {
 
 export default function DemografiaPage() {
   const { data, isLoading } = useValoracionesFiltradas()
+  const { corte } = useCorteActivo()
+
+  const buildExport = () => {
+    if (!data.length) return null
+    return {
+      titulo: 'Demografía — Caracterización de la población',
+      subtitulo: subtituloExport(corte, data.length),
+      head: ['Ingreso', 'Paciente', 'Sexo', 'Edad', 'F. Nacimiento', 'Estado civil', 'Municipio', 'Departamento', 'Zona'],
+      body: data.map(v => [
+        v.ingreso, v.nombre_paciente, v.sexo, v.edad, v.fecha_nacimiento,
+        v.estado_civil, v.municipio_residencia, v.departamento_residencia, v.zona_residencia,
+      ]),
+      nombreArchivo: `demografia_${corte ?? 'actual'}`,
+    }
+  }
 
   const mujeres = useMemo(() => data.filter(v => esMujer(v.sexo)), [data])
   const hombres = useMemo(() => data.filter(v => esHombre(v.sexo)), [data])
@@ -113,6 +131,10 @@ export default function DemografiaPage() {
       <div className="flex-1 p-5 space-y-5 overflow-auto">
         <FiltersBar />
 
+        <div className="flex items-center">
+          <ExportButtons build={buildExport} />
+        </div>
+
         {/* KPIs */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
@@ -135,8 +157,11 @@ export default function DemografiaPage() {
 
         <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
           {/* Pirámide poblacional */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Pirámide poblacional</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Pirámide poblacional
+              <InfoTip text="Pacientes agrupados en rangos de edad de 5 años (grupos quinquenales). La edad se calcula con la fecha de nacimiento al cierre del corte mensual. Hombres a la izquierda, mujeres a la derecha." />
+            </h3>
             <ResponsiveContainer width="100%" height={460}>
               <BarChart data={piramide} layout="vertical" stackOffset="sign" margin={{ left: 10, right: 20 }}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -152,8 +177,11 @@ export default function DemografiaPage() {
 
           <div className="space-y-5">
             {/* Tabla edad por género */}
-            <div className="card p-5">
-              <h3 className="text-sm font-semibold text-clinic-600 mb-4">Edad por género</h3>
+            <div className="card-chart p-5">
+              <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+                Edad por género
+                <InfoTip text="n = pacientes con edad registrada. Promedio, mínimo y máximo de la edad calculada a la fecha de corte, separados por género administrativo registrado en GoMedisys." />
+              </h3>
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-200 text-left">
@@ -179,9 +207,10 @@ export default function DemografiaPage() {
             </div>
 
             {/* Zona de residencia */}
-            <div className="card p-5">
+            <div className="card-chart p-5">
               <h3 className="text-sm font-semibold text-clinic-600 mb-2 flex items-center gap-1.5">
                 <Home className="w-4 h-4" /> Zona de residencia
+                <InfoTip text="Zona (urbana/rural) registrada en los datos de residencia del paciente en GoMedisys. 'Sin dato' agrupa pacientes sin zona registrada." />
               </h3>
               <ResponsiveContainer width="100%" height={200}>
                 <PieChart>
@@ -198,8 +227,11 @@ export default function DemografiaPage() {
         </div>
 
         {/* Distribución de edad por sexo */}
-        <div className="card p-5">
-          <h3 className="text-sm font-semibold text-clinic-600 mb-4">Distribución de edad de los pacientes atendidos</h3>
+        <div className="card-chart p-5">
+          <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+            Distribución de edad de los pacientes atendidos
+            <InfoTip text="Pacientes por grupo de edad quinquenal, apilados por sexo. Solo se muestran los grupos con al menos un paciente en el corte y filtros seleccionados." />
+          </h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={distribucion}>
               <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
@@ -215,9 +247,10 @@ export default function DemografiaPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {/* Municipio de residencia */}
-          <div className="card p-5">
+          <div className="card-chart p-5">
             <h3 className="text-sm font-semibold text-clinic-600 mb-4 flex items-center gap-1.5">
               <MapPin className="w-4 h-4" /> Municipio de residencia (top 10)
+              <InfoTip text="Los 10 municipios con más pacientes según la dirección de residencia registrada. Pacientes sin municipio aparecen como 'Sin dato'." />
             </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, porMunicipio.length * 30)}>
               <BarChart data={porMunicipio} layout="vertical" margin={{ left: 10, right: 30 }}>
@@ -231,8 +264,11 @@ export default function DemografiaPage() {
           </div>
 
           {/* Estado civil */}
-          <div className="card p-5">
-            <h3 className="text-sm font-semibold text-clinic-600 mb-4">Estado civil</h3>
+          <div className="card-chart p-5">
+            <h3 className="text-sm font-semibold text-clinic-600 mb-4">
+              Estado civil
+              <InfoTip text="Estado civil registrado en GoMedisys. El porcentaje es sobre el total de pacientes del corte y filtros seleccionados." />
+            </h3>
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

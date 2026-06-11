@@ -1,13 +1,38 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Search, Trash2, Eye, X, ChevronLeft, ChevronRight } from 'lucide-react'
+import { Loader2, Search, Trash2, Eye, X, ChevronLeft, ChevronRight, HeartPulse, LogOut, Ribbon } from 'lucide-react'
 import toast from 'react-hot-toast'
 import Header from '@/components/layout/Header'
 import FiltersBar from '@/components/dashboard/FiltersBar'
-import { useValoracionesFiltradas } from '@/hooks/useValoraciones'
+import ExportButtons from '@/components/ui/ExportButtons'
+import { useValoracionesFiltradas, useCorteActivo } from '@/hooks/useValoraciones'
+import { subtituloExport } from '@/utils/format'
 import { useAuth } from '@/hooks/useAuth'
 import { supabase } from '@/lib/supabase'
 import type { Valoracion } from '@/types'
+
+/** Badge de estado del paciente con icono (cinta negra = fallecido) */
+function EstadoBadge({ estado }: { estado: Valoracion['estado_paciente'] }) {
+  if (estado === 'Fallecido') {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-slate-800 text-white">
+        <Ribbon className="w-3 h-3" /> Fallecido
+      </span>
+    )
+  }
+  if (estado === 'Egresado') {
+    return (
+      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-sky-100 text-sky-700">
+        <LogOut className="w-3 h-3" /> Egresado
+      </span>
+    )
+  }
+  return (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+      <HeartPulse className="w-3 h-3" /> Activo
+    </span>
+  )
+}
 
 const PAGE_SIZE = 25
 
@@ -33,6 +58,22 @@ export default function ValoracionesPage() {
 
   const totalPaginas = Math.ceil(filtradas.length / PAGE_SIZE)
   const visibles = filtradas.slice(pagina * PAGE_SIZE, (pagina + 1) * PAGE_SIZE)
+  const { corte } = useCorteActivo()
+
+  const buildExport = () => {
+    if (!filtradas.length) return null
+    return {
+      titulo: 'Listado de Valoraciones — Gestión Clínica',
+      subtitulo: subtituloExport(corte, filtradas.length),
+      head: ['Ingreso', 'Paciente', 'Identificación', 'Aseguradora', 'F. Ingreso', 'Últ. Valoración', 'Especialidad', 'Estancia (d)', '>20 días', 'Estado'],
+      body: filtradas.map(v => [
+        v.ingreso, v.nombre_paciente, v.identificacion_paciente, v.aseguradora,
+        v.fecha_ingreso, v.fecha_ultima_valoracion, v.especialidad_ultima,
+        v.estancia_total, v.estancia_mayor_20_dias, v.estado_paciente,
+      ]),
+      nombreArchivo: `valoraciones_${corte ?? 'actual'}`,
+    }
+  }
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
@@ -65,7 +106,7 @@ export default function ValoracionesPage() {
       <div className="flex-1 p-5 space-y-4 overflow-auto">
         <FiltersBar />
 
-        {/* Búsqueda */}
+        {/* Búsqueda + exportes */}
         <div className="card p-3 flex items-center gap-3">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
@@ -77,6 +118,7 @@ export default function ValoracionesPage() {
               className="filter-select w-full pl-9"
             />
           </div>
+          <ExportButtons build={buildExport} />
         </div>
 
         {/* Tabla */}
@@ -108,13 +150,7 @@ export default function ValoracionesPage() {
                       </span>
                     </td>
                     <td className="px-3 py-2">
-                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${
-                        v.estado_paciente === 'Activo' ? 'bg-emerald-100 text-emerald-700'
-                        : v.estado_paciente === 'Fallecido' ? 'bg-slate-200 text-slate-600'
-                        : 'bg-sky-100 text-sky-700'
-                      }`}>
-                        {v.estado_paciente}
-                      </span>
+                      <EstadoBadge estado={v.estado_paciente} />
                     </td>
                     <td className="px-3 py-2">
                       <div className="flex items-center gap-1 justify-end">
