@@ -1,0 +1,58 @@
+name: "Sync GoMedisys → Supabase"
+
+on:
+  schedule:
+    # 3:00 am Colombia (UTC-5) = 8:00 UTC, una vez al día
+    - cron: "0 8 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "Modo de sincronización"
+        required: false
+        default: "daily"
+        type: choice
+        options:
+          - daily
+          - initial
+      months_back:
+        description: "Meses hacia atrás (solo modo initial)"
+        required: false
+        default: "6"
+      days_back:
+        description: "Días hacia atrás (solo modo daily)"
+        required: false
+        default: "35"
+
+jobs:
+  sync:
+    name: Daily Sync
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        run: npm install --prefer-offline
+        working-directory: ./scripts/sync
+
+      - name: Run sync
+        env:
+          GOMEDISYS_HOST:       ${{ secrets.GOMEDISYS_HOST }}
+          GOMEDISYS_PORT:       ${{ secrets.GOMEDISYS_PORT }}
+          GOMEDISYS_DATABASE:   ${{ secrets.GOMEDISYS_DATABASE }}
+          GOMEDISYS_USERNAME:   ${{ secrets.GOMEDISYS_USERNAME }}
+          GOMEDISYS_PASSWORD:   ${{ secrets.GOMEDISYS_PASSWORD }}
+          SUPABASE_URL:         ${{ secrets.VITE_SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          MODE:                 ${{ github.event.inputs.mode || 'daily' }}
+          MONTHS_BACK:          ${{ github.event.inputs.months_back || '6' }}
+          DAYS_BACK:            ${{ github.event.inputs.days_back || '35' }}
+          TRIGGERED_BY:         ${{ github.event_name == 'workflow_dispatch' && 'manual' || 'cron' }}
+        run: node index.js
+        working-directory: ./scripts/sync

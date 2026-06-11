@@ -1,0 +1,24 @@
+# Secretos - nunca al repositorio
+.env
+.env.*
+!.env.example
+scripts/importar_datos.ps1
+
+# Datos de pacientes / documentos internos - NUNCA al repositorio
+docs/*.csv
+docs/*.xlsx
+docs/*.docx
+docs/*.jpeg
+docs/*.jpg
+docs/unpacked/
+
+# Dependencias y builds
+node_modules/
+dist/
+
+# Utilidades locales
+app/dev.cmd
+
+# Temporales
+~$*
+*.log
