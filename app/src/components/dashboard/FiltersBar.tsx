@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 import { RotateCcw } from 'lucide-react'
 import { useStore } from '@/store/useStore'
-import { useValoraciones, useCorteActivo } from '@/hooks/useValoraciones'
+import { useValoraciones, useCorteActivo, CORTE_TODOS } from '@/hooks/useValoraciones'
 import { MESES } from '@/types'
 
 function uniq(values: (string | null)[]): string[] {
@@ -24,12 +24,13 @@ export default function FiltersBar() {
     aseguradoras: uniq(all.map(v => v.aseguradora)),
     sedes: uniq(all.map(v => v.sede)),
     especialidades: uniq(all.map(v => v.especialidad_ultima)),
+    profesionales: uniq(all.map(v => v.profesional_ultima)),
     sexos: uniq(all.map(v => v.sexo)),
   }), [all])
 
-  const hayFiltros = filtros.anio || filtros.mes || filtros.aseguradora.length ||
-    filtros.sede.length || filtros.especialidad.length || filtros.estado.length ||
-    filtros.largaEstancia || filtros.sexo.length
+  const hayFiltros = filtros.corte || filtros.anio || filtros.mes || filtros.aseguradora.length ||
+    filtros.sede.length || filtros.especialidad.length || filtros.profesional.length ||
+    filtros.estado.length || filtros.largaEstancia || filtros.sexo.length
 
   return (
     <div className="card p-3 flex flex-nowrap items-end gap-2 overflow-x-auto">
@@ -38,6 +39,7 @@ export default function FiltersBar() {
         <select className="filter-select" value={corte ?? ''}
           onChange={e => setFiltros({ corte: e.target.value || null })}>
           {cortes.length === 0 && <option value="">Sin datos</option>}
+          <option value={CORTE_TODOS}>Todos</option>
           {cortes.map(c => <option key={c} value={c}>{labelCorte(c)}</option>)}
         </select>
       </div>
@@ -84,6 +86,15 @@ export default function FiltersBar() {
           onChange={e => setFiltros({ especialidad: e.target.value ? [e.target.value] : [] })}>
           <option value="">Todas</option>
           {opciones.especialidades.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
+
+      <div className="flex-shrink-0">
+        <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Profesional</label>
+        <select className="filter-select max-w-[140px]" value={filtros.profesional[0] ?? ''}
+          onChange={e => setFiltros({ profesional: e.target.value ? [e.target.value] : [] })}>
+          <option value="">Todos</option>
+          {opciones.profesionales.map(p => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
 

@@ -19,7 +19,10 @@ export function useCortes() {
   })
 }
 
-/** Corte efectivo: el seleccionado en filtros o, por defecto, el más reciente */
+/** Valor especial del filtro de corte: incluir todos los meses */
+export const CORTE_TODOS = 'todos'
+
+/** Corte efectivo: el seleccionado en filtros ('todos' = sin filtrar) o, por defecto, el más reciente */
 export function useCorteActivo() {
   const { data: cortes = [], isLoading } = useCortes()
   const { filtros } = useStore()
@@ -42,7 +45,7 @@ export function useValoraciones() {
           .select('*')
           .order('fecha_ingreso', { ascending: false })
           .range(from, from + PAGE - 1)
-        if (corte) q = q.eq('fecha_corte', corte)
+        if (corte && corte !== CORTE_TODOS) q = q.eq('fecha_corte', corte)
         const { data, error } = await q
         if (error) throw error
         all = all.concat(data as Valoracion[])

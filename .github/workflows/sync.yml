@@ -2,8 +2,11 @@ name: "Sync GoMedisys → Supabase"
 
 on:
   schedule:
-    # 3:00 am Colombia (UTC-5) = 8:00 UTC, una vez al día
-    - cron: "0 8 * * *"
+    # 3:17 am Colombia (UTC-5) = 8:17 UTC, una vez al día.
+    # Se usa un minuto "impar" porque GitHub Actions encola los crons y los
+    # que caen en el minuto 0 de cada hora sufren los mayores retrasos
+    # (la hora programada es "mejor esfuerzo", no garantizada).
+    - cron: "17 8 * * *"
   workflow_dispatch:
     inputs:
       mode:
