@@ -198,6 +198,35 @@ function mapRow(r, fechaCorte) {
   };
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+// El servidor de GoMedisys corre en un Always On Availability Group; la
+// replica secundaria de solo lectura a veces aborta la transaccion por
+// limpieza de ghost records o cambio de estado de la replica (visto el
+// 2026-06-25 y 2026-07-07). SQL Server pide explicitamente "retry the
+// transaction": es transitorio, no un error del query.
+const RETRYABLE_ERROR = /availability replica config\/state change/i;
+const MAX_ATTEMPTS = 3;
+const RETRY_DELAY_MS = 15_000;
+
+async function queryWithRetry(pool, querySQL, win) {
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      const req = pool.request();
+      req.input('StartDate', sql.Date, win.start);
+      req.input('EndDate',   sql.Date, win.end);
+      return await req.query(querySQL);
+    } catch (err) {
+      const isLastAttempt = attempt === MAX_ATTEMPTS;
+      if (!RETRYABLE_ERROR.test(err.message) || isLastAttempt) throw err;
+      console.log(`[sync] Snapshot ${win.corte}: error transitorio de la replica (intento ${attempt}/${MAX_ATTEMPTS}), reintentando en ${RETRY_DELAY_MS / 1000}s…`);
+      await sleep(RETRY_DELAY_MS);
+    }
+  }
+}
+
 // ── Main ───────────────────────────────────────────────────────────────────
 
 async function main() {
@@ -250,11 +279,7 @@ async function main() {
 
     for (const win of windows) {
       console.log(`[sync] Snapshot ${win.corte}: consultando ${win.start} → ${win.end}…`);
-      const req = pool.request();
-      req.input('StartDate', sql.Date, win.start);
-      req.input('EndDate',   sql.Date, win.end);
-
-      const result = await req.query(querySQL);
+      const result = await queryWithRetry(pool, querySQL, win);
       recordsFetched += result.recordset.length;
       console.log(`[sync] Snapshot ${win.corte}: ${result.recordset.length} registros`);
 
