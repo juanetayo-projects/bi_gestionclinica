@@ -236,7 +236,12 @@ async function main() {
         encrypt: true,
         trustServerCertificate: false,
         connectTimeout: 30_000,
-        requestTimeout: 600_000,   // el script es pesado: hasta 10 min
+        // Parche temporal (2026-07-07): el query venia degradando (88s -> 600s+
+        // en un mes) porque a GoMedisys le faltan los indices recomendados en
+        // query.sql (EHREvents crece con TODA la actividad del hospital, no
+        // solo Gestion Clinica). Subir el timeout solo compra tiempo; el fix
+        // real es crear esos indices en el servidor de GoMedisys.
+        requestTimeout: 1_200_000,   // 20 min
       },
     });
     console.log('[sync] Conexión a GoMedisys establecida');
