@@ -174,7 +174,7 @@ export default function AdminPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left">
+                  <tr className="border-b border-slate-300/50 text-left">
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Usuario</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Email</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Rol</th>
@@ -184,7 +184,7 @@ export default function AdminPage() {
                 </thead>
                 <tbody>
                   {users.map((u) => (
-                    <tr key={u.id} className="border-b border-slate-100 hover:bg-slate-50">
+                    <tr key={u.id} className="border-b border-slate-300/30 hover:bg-black/[0.03]">
                       <td className="py-2.5 pr-4 font-medium text-slate-700">{u.nombres}</td>
                       <td className="py-2.5 pr-4 text-slate-500">{u.email}</td>
                       <td className="py-2.5 pr-4">
@@ -247,7 +247,7 @@ export default function AdminPage() {
           ) : (
             <div className="space-y-3">
               {(configs as Configuracion[]).map((c) => (
-                <div key={c.clave} className="flex items-center gap-4 p-3 bg-slate-50 rounded-lg">
+                <div key={c.clave} className="flex items-center gap-4 p-3 bg-neu-100 rounded-lg shadow-neu-inset-sm">
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-slate-700">{c.clave}</p>
                     <p className="text-xs text-slate-400">{c.descripcion}</p>
@@ -287,7 +287,7 @@ export default function AdminPage() {
               { role: 'Administrador', color: 'red',   perms: ['Ver dashboard y escalas', 'Filtros completos', 'Exportar reportes', 'Ver sincronización', 'Gestionar usuarios', 'Configurar sistema'] },
               { role: 'Consulta',      color: 'green', perms: ['Ver dashboard y escalas', 'Filtros completos', 'Exportar reportes'] },
             ].map(({ role, color, perms }) => (
-              <div key={role} className="border border-slate-200 rounded-xl p-4">
+              <div key={role} className="rounded-xl p-4 shadow-neu-inset-sm">
                 <span className={`inline-block text-xs bg-${color}-100 text-${color}-700 font-semibold px-2.5 py-1 rounded-full mb-3`}>
                   {role}
                 </span>

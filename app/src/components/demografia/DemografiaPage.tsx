@@ -164,7 +164,7 @@ export default function DemografiaPage() {
             </h3>
             <ResponsiveContainer width="100%" height={460}>
               <BarChart data={piramide} layout="vertical" stackOffset="sign" margin={{ left: 10, right: 20 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                 <XAxis type="number" tick={{ fontSize: 10 }} tickFormatter={(v: number) => String(Math.abs(v))} />
                 <YAxis type="category" dataKey="grupo" width={62} tick={{ fontSize: 10 }} />
                 <Tooltip formatter={(v: number) => Math.abs(v)} />
@@ -184,7 +184,7 @@ export default function DemografiaPage() {
               </h3>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left">
+                  <tr className="border-b border-slate-300/50 text-left">
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Género</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">n</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">Promedio</th>
@@ -194,7 +194,7 @@ export default function DemografiaPage() {
                 </thead>
                 <tbody>
                   {tablaGenero.map(r => (
-                    <tr key={r.genero} className={`border-b border-slate-100 ${r.genero === 'Total' ? 'font-bold' : ''}`}>
+                    <tr key={r.genero} className={`border-b border-slate-300/30 ${r.genero === 'Total' ? 'font-bold' : ''}`}>
                       <td className="py-2 text-slate-700">{r.genero}</td>
                       <td className="py-2 text-right text-clinic-600 font-semibold">{r.n}</td>
                       <td className="py-2 text-right text-slate-600">{r.prom != null ? r.prom.toFixed(1) : '—'}</td>
@@ -234,7 +234,7 @@ export default function DemografiaPage() {
           </h3>
           <ResponsiveContainer width="100%" height={280}>
             <BarChart data={distribucion}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
               <XAxis dataKey="grupo" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip />
@@ -254,7 +254,7 @@ export default function DemografiaPage() {
             </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, porMunicipio.length * 30)}>
               <BarChart data={porMunicipio} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                 <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" width={120} tick={{ fontSize: 10 }} />
                 <Tooltip />
@@ -272,7 +272,7 @@ export default function DemografiaPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left">
+                  <tr className="border-b border-slate-300/50 text-left">
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Estado civil</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">Pacientes</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">%</th>
@@ -280,7 +280,7 @@ export default function DemografiaPage() {
                 </thead>
                 <tbody>
                   {porEstadoCivil.map(e => (
-                    <tr key={e.name} className="border-b border-slate-100">
+                    <tr key={e.name} className="border-b border-slate-300/30">
                       <td className="py-2 text-slate-700">{e.name}</td>
                       <td className="py-2 text-right font-semibold text-clinic-600">{e.value}</td>
                       <td className="py-2 text-right text-slate-400">

@@ -142,7 +142,7 @@ export default function DiagnosticosPage() {
           </h3>
           <ResponsiveContainer width="100%" height={Math.max(260, porCapitulo.length * 30)}>
             <BarChart data={porCapitulo} layout="vertical" margin={{ left: 10, right: 30 }}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
               <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
               <YAxis type="category" dataKey="name" width={210} tick={{ fontSize: 10 }} />
               <Tooltip />
@@ -160,7 +160,7 @@ export default function DiagnosticosPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-slate-200 text-left">
+                <tr className="border-b border-slate-300/50 text-left">
                   <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Código</th>
                   <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Diagnóstico</th>
                   <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Capítulo</th>
@@ -170,7 +170,7 @@ export default function DiagnosticosPage() {
               </thead>
               <tbody>
                 {topDiagnosticos.map(d => (
-                  <tr key={d.codigo} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={d.codigo} className="border-b border-slate-300/30 hover:bg-black/[0.03]">
                     <td className="py-2 pr-3 font-mono text-xs font-semibold text-clinic-600">{d.codigo}</td>
                     <td className="py-2 pr-3 text-slate-700">{d.nombre}</td>
                     <td className="py-2 pr-3 text-slate-400 text-xs">{capituloCIE10(d.codigo)}</td>

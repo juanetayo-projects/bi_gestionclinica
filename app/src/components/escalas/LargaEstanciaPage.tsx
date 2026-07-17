@@ -138,7 +138,7 @@ export default function LargaEstanciaPage() {
           </h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={evolucionMensual}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip />
@@ -158,7 +158,7 @@ export default function LargaEstanciaPage() {
             </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, causas.length * 36)}>
               <BarChart data={causas} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                 <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" width={180} tick={{ fontSize: 10 }} />
                 <Tooltip />
@@ -175,7 +175,7 @@ export default function LargaEstanciaPage() {
             </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, intervenciones.length * 36)}>
               <BarChart data={intervenciones} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                 <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" width={180} tick={{ fontSize: 10 }} />
                 <Tooltip />

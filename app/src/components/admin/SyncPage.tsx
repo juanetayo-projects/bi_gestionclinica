@@ -184,7 +184,7 @@ export default function SyncPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left">
+                  <tr className="border-b border-slate-300/50 text-left">
                     {['Ejecutado', 'Estado', 'Obtenidos', 'Actualizados', 'Duración', 'Periodo', 'Origen', 'Error'].map(h => (
                       <th key={h} className="pb-2 pr-4 text-xs font-semibold text-slate-500 uppercase whitespace-nowrap">
                         {h}
@@ -197,7 +197,7 @@ export default function SyncPage() {
                     <tr
                       key={log.id}
                       className={clsx(
-                        'border-b border-slate-100 hover:bg-slate-50',
+                        'border-b border-slate-300/30 hover:bg-black/[0.03]',
                         log.status === 'error'   && 'bg-red-50/50',
                         log.status === 'partial' && 'bg-yellow-50/40',
                       )}

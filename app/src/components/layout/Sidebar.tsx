@@ -1,6 +1,7 @@
 import { NavLink } from 'react-router-dom'
 import {
   LayoutDashboard,
+  Gauge,
   FileText,
   Settings,
   ChevronLeft,
@@ -19,6 +20,7 @@ import { clsx } from 'clsx'
 
 const NAV = [
   { to: '/dashboard',      icon: LayoutDashboard, label: 'Resumen General' },
+  { to: '/panel-resumen',  icon: Gauge,           label: 'Panel Resumen' },
   { to: '/demografia',     icon: Users,           label: 'Demografía' },
   { to: '/diagnosticos',   icon: HeartPulse,      label: 'Diagnósticos' },
   { to: '/escalas',        icon: Stethoscope,     label: 'Escalas Clínicas' },

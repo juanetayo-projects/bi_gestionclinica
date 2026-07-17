@@ -4,6 +4,7 @@ import LoginPage from '@/components/auth/LoginPage'
 import ProtectedRoute from '@/components/auth/ProtectedRoute'
 import Layout from '@/components/layout/Layout'
 import DashboardPage from '@/components/dashboard/DashboardPage'
+import PanelResumenPage from '@/components/panelresumen/PanelResumenPage'
 import AdminPage from '@/components/admin/AdminPage'
 import SyncPage from '@/components/admin/SyncPage'
 import ReportsPage from '@/components/reports/ReportsPage'
@@ -43,6 +44,7 @@ export default function App() {
           <Route element={<Layout />}>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/dashboard" element={<DashboardPage />} />
+            <Route path="/panel-resumen" element={<PanelResumenPage />} />
             <Route path="/demografia" element={<DemografiaPage />} />
             <Route path="/diagnosticos" element={<DiagnosticosPage />} />
             <Route path="/escalas" element={<EscalasPage />} />

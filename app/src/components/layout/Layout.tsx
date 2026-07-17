@@ -7,7 +7,7 @@ export default function Layout() {
   const { sidebarCollapsed } = useStore()
 
   return (
-    <div className="h-screen overflow-hidden bg-slate-50">
+    <div className="h-screen overflow-hidden bg-neu-100">
       <Sidebar />
       <main
         className={clsx(
@@ -21,7 +21,7 @@ export default function Layout() {
         </div>
 
         {/* Footer */}
-        <footer className="flex-shrink-0 py-1.5 px-4 border-t border-slate-100 bg-slate-50">
+        <footer className="flex-shrink-0 py-1.5 px-4 border-t border-slate-300/40 bg-neu-100">
           <p className="text-[10px] text-slate-300 text-center tracking-wide">
             Desarrollado por: Ing. Juan Carlos Etayo Ruiz
           </p>

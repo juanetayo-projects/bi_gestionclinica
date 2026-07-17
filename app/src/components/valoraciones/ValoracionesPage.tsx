@@ -134,7 +134,7 @@ export default function ValoracionesPage() {
               </thead>
               <tbody>
                 {visibles.map(v => (
-                  <tr key={v.id} className="border-b border-slate-100 hover:bg-slate-50">
+                  <tr key={v.id} className="border-b border-slate-300/30 hover:bg-black/[0.03]">
                     <td className="px-3 py-2 font-medium text-clinic-600">{v.ingreso}</td>
                     <td className="px-3 py-2 text-slate-700 max-w-[220px] truncate">{v.nombre_paciente}</td>
                     <td className="px-3 py-2 text-slate-500">{v.identificacion_paciente}</td>
@@ -177,17 +177,17 @@ export default function ValoracionesPage() {
 
           {/* Paginación */}
           {totalPaginas > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-100">
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-300/30">
               <p className="text-xs text-slate-400">
                 Página {pagina + 1} de {totalPaginas} · {filtradas.length.toLocaleString('es-CO')} registros
               </p>
               <div className="flex gap-1">
                 <button disabled={pagina === 0} onClick={() => setPagina(p => p - 1)}
-                  className="p-1.5 rounded-lg border border-slate-200 text-slate-500 disabled:opacity-30 hover:bg-slate-50">
+                  className="p-1.5 rounded-lg text-slate-500 shadow-neu-sm disabled:opacity-30 disabled:shadow-none hover:text-clinic-600">
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button disabled={pagina >= totalPaginas - 1} onClick={() => setPagina(p => p + 1)}
-                  className="p-1.5 rounded-lg border border-slate-200 text-slate-500 disabled:opacity-30 hover:bg-slate-50">
+                  className="p-1.5 rounded-lg text-slate-500 shadow-neu-sm disabled:opacity-30 disabled:shadow-none hover:text-clinic-600">
                   <ChevronRight className="w-4 h-4" />
                 </button>
               </div>

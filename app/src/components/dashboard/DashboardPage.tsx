@@ -111,7 +111,7 @@ export default function DashboardPage() {
           </h3>
           <ResponsiveContainer width="100%" height={260}>
             <BarChart data={historicoMensual}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+              <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
               <XAxis dataKey="name" tick={{ fontSize: 11 }} />
               <YAxis tick={{ fontSize: 11 }} allowDecimals={false} />
               <Tooltip />
@@ -131,7 +131,7 @@ export default function DashboardPage() {
             </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, porAseguradora.length * 32)}>
               <BarChart data={porAseguradora} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                 <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" width={170} tick={{ fontSize: 10 }} />
                 <Tooltip />
@@ -167,7 +167,7 @@ export default function DashboardPage() {
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left">
+                  <tr className="border-b border-slate-300/50 text-left">
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Sede</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">Pacientes</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">%</th>
@@ -175,7 +175,7 @@ export default function DashboardPage() {
                 </thead>
                 <tbody>
                   {porSede.map(s => (
-                    <tr key={s.name} className="border-b border-slate-100">
+                    <tr key={s.name} className="border-b border-slate-300/30">
                       <td className="py-2 text-slate-700">{s.name}</td>
                       <td className="py-2 text-right font-semibold text-clinic-600">{s.value}</td>
                       <td className="py-2 text-right text-slate-400">
@@ -196,7 +196,7 @@ export default function DashboardPage() {
             </h3>
             <ResponsiveContainer width="100%" height={Math.max(220, porEspecialidad.length * 34)}>
               <BarChart data={porEspecialidad} layout="vertical" margin={{ left: 10, right: 30 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                 <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
                 <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} />
                 <Tooltip />

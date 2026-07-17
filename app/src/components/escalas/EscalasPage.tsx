@@ -154,8 +154,8 @@ export default function EscalasPage() {
             { key: 'barthel', nombre: 'Barthel' },
           ].map(e => (
             <button key={e.key} onClick={() => setTab(e.key)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
-                tab === e.key ? 'bg-clinic-600 text-white shadow-sm' : 'bg-white border border-slate-200 text-slate-600 hover:bg-clinic-50'
+              className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                tab === e.key ? 'bg-clinic-600 text-white shadow-neu-sm' : 'bg-neu-100 text-slate-600 shadow-neu-inset-sm hover:text-clinic-600'
               }`}>
               {e.nombre}
             </button>
@@ -193,7 +193,7 @@ export default function EscalasPage() {
               </h3>
               <ResponsiveContainer width="100%" height={260}>
                 <BarChart data={barthelMomentos}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                   <XAxis dataKey="name" tick={{ fontSize: 12 }} />
                   <YAxis tick={{ fontSize: 11 }} />
                   <Tooltip />
@@ -210,7 +210,7 @@ export default function EscalasPage() {
               </h3>
               <ResponsiveContainer width="100%" height={Math.max(260, barthelCategorias.length * 40)}>
                 <BarChart data={barthelCategorias} layout="vertical" margin={{ left: 10, right: 20 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                   <XAxis type="number" tick={{ fontSize: 11 }} allowDecimals={false} />
                   <YAxis type="category" dataKey="name" width={150} tick={{ fontSize: 10 }} />
                   <Tooltip />
@@ -230,7 +230,7 @@ export default function EscalasPage() {
             </h3>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={esasPromedios}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" />
+                <CartesianGrid strokeDasharray="3 3" stroke="#c7ced9" />
                 <XAxis dataKey="name" tick={{ fontSize: 10 }} angle={-25} textAnchor="end" height={60} />
                 <YAxis domain={[0, 10]} tick={{ fontSize: 11 }} />
                 <Tooltip />
@@ -263,7 +263,7 @@ export default function EscalasPage() {
               </h3>
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="border-b border-slate-200 text-left">
+                  <tr className="border-b border-slate-300/50 text-left">
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase">Resultado</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">n</th>
                     <th className="pb-2 text-xs font-semibold text-slate-500 uppercase text-right">%</th>
@@ -271,7 +271,7 @@ export default function EscalasPage() {
                 </thead>
                 <tbody>
                   {porResultado.map(r => (
-                    <tr key={r.name} className="border-b border-slate-100">
+                    <tr key={r.name} className="border-b border-slate-300/30">
                       <td className="py-2 text-slate-700">{r.name}</td>
                       <td className="py-2 text-right font-semibold text-clinic-600">{r.value}</td>
                       <td className="py-2 text-right text-slate-400">

@@ -37,11 +37,11 @@ export default function ExportButtons({ build }: ExportButtonsProps) {
   return (
     <div className="flex items-center gap-2 ml-auto flex-shrink-0">
       <button onClick={handleExcel}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 hover:bg-emerald-100 transition-colors">
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-emerald-700 bg-neu-100 shadow-neu-sm active:shadow-neu-inset-sm hover:text-emerald-800 transition-all">
         <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
       </button>
       <button onClick={handlePDF} disabled={busy}
-        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 bg-red-50 border border-red-200 hover:bg-red-100 transition-colors disabled:opacity-50">
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 bg-neu-100 shadow-neu-sm active:shadow-neu-inset-sm hover:text-red-800 transition-all disabled:opacity-50">
         {busy ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <FileText className="w-3.5 h-3.5" />} PDF
       </button>
     </div>
