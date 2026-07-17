@@ -24,7 +24,7 @@ on:
       days_back:
         description: "Días hacia atrás (solo modo daily)"
         required: false
-        default: "35"
+        default: "10"
 
 jobs:
   sync:
@@ -55,7 +55,7 @@ jobs:
           SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
           MODE:                 ${{ github.event.inputs.mode || 'daily' }}
           MONTHS_BACK:          ${{ github.event.inputs.months_back || '6' }}
-          DAYS_BACK:            ${{ github.event.inputs.days_back || '35' }}
+          DAYS_BACK:            ${{ github.event.inputs.days_back || '10' }}
           TRIGGERED_BY:         ${{ github.event_name == 'workflow_dispatch' && 'manual' || 'cron' }}
         run: node index.js
         working-directory: ./scripts/sync

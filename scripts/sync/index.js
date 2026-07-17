@@ -6,7 +6,7 @@
  *
  * Modos (env):
  *   MODE=initial  → backfill de los últimos MONTHS_BACK meses (default 6)
- *   MODE=daily    → meses tocados por la ventana de DAYS_BACK días (default 35):
+ *   MODE=daily    → meses tocados por la ventana de DAYS_BACK días (default 10):
  *                   refresca el mes en curso y re-cierra el anterior.
  *
  * Modelo de snapshots mensuales: la query se ejecuta UNA VEZ POR MES
@@ -207,7 +207,16 @@ function sleep(ms) {
 // limpieza de ghost records o cambio de estado de la replica (visto el
 // 2026-06-25 y 2026-07-07). SQL Server pide explicitamente "retry the
 // transaction": es transitorio, no un error del query.
-const RETRYABLE_ERROR = /availability replica config\/state change/i;
+//
+// El query tambien sufre timeouts intermitentes por falta de indice en
+// EHREvents(idEncounter) en GoMedisys (ver query.sql, "INDICES RECOMENDADOS"):
+// sin ese indice cada snapshot hace table scan completo de EHREvents (toda
+// la actividad del hospital). La duracion varia mucho segun carga de la
+// replica en ese momento (visto 2026-07-07: mismo query, mismo dia, entre
+// 28s y timeout de 600s), asi que reintentar un timeout suele funcionar.
+// El fix real es crear ese indice en GoMedisys; esto solo mitiga mientras
+// tanto.
+const RETRYABLE_ERROR = /availability replica config\/state change|^Timeout: Request failed to complete/i;
 const MAX_ATTEMPTS = 3;
 const RETRY_DELAY_MS = 15_000;
 
@@ -221,7 +230,7 @@ async function queryWithRetry(pool, querySQL, win) {
     } catch (err) {
       const isLastAttempt = attempt === MAX_ATTEMPTS;
       if (!RETRYABLE_ERROR.test(err.message) || isLastAttempt) throw err;
-      console.log(`[sync] Snapshot ${win.corte}: error transitorio de la replica (intento ${attempt}/${MAX_ATTEMPTS}), reintentando en ${RETRY_DELAY_MS / 1000}s…`);
+      console.log(`[sync] Snapshot ${win.corte}: error transitorio (${err.message}) (intento ${attempt}/${MAX_ATTEMPTS}), reintentando en ${RETRY_DELAY_MS / 1000}s…`);
       await sleep(RETRY_DELAY_MS);
     }
   }
@@ -243,7 +252,7 @@ async function main() {
   const end = todayColombia();
   const start = mode === 'initial'
     ? dateMinus(end, { months: parseInt(process.env.MONTHS_BACK || '6', 10) })
-    : dateMinus(end, { days: parseInt(process.env.DAYS_BACK || '35', 10) });
+    : dateMinus(end, { days: parseInt(process.env.DAYS_BACK || '10', 10) });
 
   const windows = monthWindows(start, end);
   console.log(`[sync] Modo: ${mode} | Rango: ${start} → ${end} | Snapshots: ${windows.map(w => w.corte).join(', ')} | Por: ${triggeredBy}`);
